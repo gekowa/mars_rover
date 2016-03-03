@@ -1,0 +1,20 @@
+{
+  "name": "mars_rover",
+  "version": "1.0.0",
+  "description": "A NASA way of exploring plateaus on Mars",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Guo Xinghua",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^2.2.5"
+  },
+  "dependencies": {
+    "underscore": "^1.8.3"
+  }
+}
