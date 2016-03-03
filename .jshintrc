@@ -29,6 +29,7 @@
       "module",
       "require",
       "before",
+      "process",
 
       /* Meteor */
       "Meteor",

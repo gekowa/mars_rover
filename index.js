@@ -1,3 +1,4 @@
+
 var Rover = require("./lib/rover.js"),
 	fs = require('fs');
 
@@ -16,9 +17,6 @@ var charsOfFirstLine = firstLine.split("\x20");
 var upperBoundary = parseInt(charsOfFirstLine[0]);
 var rightBoundary = parseInt(charsOfFirstLine[1]);
 
-// console.log(upperBoundary);
-// console.log(rightBoundary);
-
 // rest of lines
 var i;
 for (i = 1; i < linesOfInput.length; i += 2) {
@@ -34,48 +32,68 @@ for (i = 1; i < linesOfInput.length; i += 2) {
 		"left": left,
 		"top": top,
 		"orientation": orientation.charAt(0),
-		"upperBoundary": upperBoundary,
-		"rightBoundary": rightBoundary
+		"verticalBoundary": upperBoundary,
+		"horizontalBoundary": rightBoundary
 	});
 
-	// process control string
-	var j;
-	for (j = 0; j < controlString.length; j++) {
-		// console.log(controlString.charAt(j));
-		switch(controlString.charAt(j)) {
-			case "L":
-				rover.turnLeft();
-				break;
-			case "R":
-				rover.turnRight();
-				break;
-			case "M":
-				rover.moveForward();
-				break;
-			case "B":
-				rover.moveBackward();
-				break;
+	// let's do something about state machine
+	var j = 0, c, numberStack = [];
+	var STATES = {
+		"Idle": null,
+		"MovingForward": "F",
+		"MovingBackward": "B"
+	};
+	var ORDERS = ["L", "R", "F", "B"];
+	var state = STATES.Idle;
+
+	var doMove = function () {
+		if (numberStack.length > 0) {
+			var number = parseInt(numberStack.join(''));
+			switch (state) {
+				case STATES.MovingForward:
+					rover.moveForward(number);
+					break;
+				case STATES.MovingBackward:
+					rover.moveBackward(number);
+					break;
+			}
+
+			numberStack = [];
 		}
-		// console.log(rover.output());
+	};
+
+	for (;;) {
+		c = controlString.charAt(j);
+		if (!c) {
+			doMove();
+			break;
+		}
+
+		if (c.match(/\d/)) {
+			numberStack.push(c);
+		} else if (ORDERS.indexOf(c) >= 0) {
+			doMove();
+
+			switch (c) {
+				case "L":
+					rover.turnLeft();
+					break;
+				case "R":
+					rover.turnRight();
+					break;
+				case "F":
+					state = STATES.MovingForward;
+					break;
+				case "B":
+					state = STATES.MovingBackward;
+					break;
+			}
+		}
+
+		j++;
 	}
 
-	console.log(rover.output());
+	// console.log(rover.footmark);
+	rover.outputPath();
+	process.stdout.write(rover.output());
 }
-
-
-//
-/*
-var i;
-for (i = 0; i < controlString.length; i++) {
-	switch(controlString.charAt(i)) {
-		case "L":
-			this.turnLeft();
-			break;
-		case "R":
-			this.turnRight();
-			break;
-		case "M":
-			this.moveForward();
-	}
-}
-*/
